@@ -4,12 +4,16 @@ import os
 from keras.preprocessing.image import load_img, img_to_array
 from keras.preprocessing.image import ImageDataGenerator
 from keras.preprocessing.image import Iterator
+import imgaug as ia
+# from IPython.display import display
+from imgaug import augmenters as iaa
+from plot_info import plot_img
 
 
 class CustomGenerator(Sequence):
 
     def __init__(self, root_path, sample_x, labels, batch_size, dim, n_channels=1,
-                 n_classes=10, shuffle=True):
+                 n_classes=10, shuffle=True, augment=True):
 
         'Initialization'
         self.dim = dim
@@ -20,6 +24,7 @@ class CustomGenerator(Sequence):
         self.n_classes = n_classes
         self.shuffle = shuffle
         self.root_path = root_path
+        self.augment = augment
         self.on_epoch_end()
 
     def on_epoch_end(self):
@@ -35,6 +40,37 @@ class CustomGenerator(Sequence):
         Y = np.zeros((self.batch_size, 28))
         colors = ['red', 'green', 'blue']
 
+        seq = iaa.Sequential([
+            iaa.OneOf([
+                iaa.Fliplr(0.5),  # horizontal flips
+                iaa.Crop(percent=(0, 0.1)),  # random crops
+                # Small gaussian blur with random sigma between 0 and 0.5.
+                # But we only blur about 50% of all images.
+                iaa.Sometimes(0.5,
+                              iaa.GaussianBlur(sigma=(0, 0.5))
+                              ),
+                # Strengthen or weaken the contrast in each image.
+                iaa.ContrastNormalization((0.75, 1.5)),
+                # Add gaussian noise.
+                # For 50% of all images, we sample the noise once per pixel.
+                # For the other 50% of all images, we sample the noise per pixel AND
+                # channel. This can change the color (not only brightness) of the
+                # pixels.
+                iaa.AdditiveGaussianNoise(loc=0, scale=(0.0, 0.05 * 255), per_channel=0.5),
+                # Make some images brighter and some darker.
+                # In 20% of all cases, we sample the multiplier once per channel,
+                # which can end up changing the color of the images.
+                iaa.Multiply((0.8, 1.2), per_channel=0.2),
+                # Apply affine transformations to each image.
+                # Scale/zoom them, translate/move them, rotate them and shear them.
+                iaa.Affine(
+                    scale={"x": (0.8, 1.2), "y": (0.8, 1.2)},
+                    translate_percent={"x": (-0.2, 0.2), "y": (-0.2, 0.2)},
+                    rotate=(-180, 180),
+                    shear=(-8, 8)
+                )
+            ])], random_order=True)
+
         # Generate data
         for i, ID in enumerate(samples_temp):
             # Store sample
@@ -46,11 +82,17 @@ class CustomGenerator(Sequence):
                 real_img = img[:, :, 0]
                 X[i, :, :, each] = real_img
 
-            # Store class
-            for key in self.labels[ID]:
-                Y[i, int(key)] = 1
+            if self.labels is not None:
+                for key in self.labels[ID]:
+                    Y[i, int(key)] = 1
 
-        return X / 255.0, Y
+        if self.augment:
+            X = seq.augment_images(X)
+
+        if self.labels is not None:
+            return X / 255.0, Y
+        else:
+            return X / 255.0
 
     def __getitem__(self, index):
         indexs = self.indexes[index * self.batch_size: (index + 1) * self.batch_size]
@@ -58,14 +100,4 @@ class CustomGenerator(Sequence):
         return self.__data_generation(sample_temp)
 
     def __len__(self):
-        return np.ceil(len(self.labels) / self.batch_size).astype(np.int64)
-
-
-class CustomImageGenerator(ImageDataGenerator):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-    def flow_from_gen(self, root_path, sample_x, labels, batch_size, dim, n_channels=3,
-                      n_classes=10, shuffle=True):
-        return CustomGenerator(self, root_path, sample_x, labels, batch_size, dim, n_channels,
-                               n_classes, shuffle)
+        return np.ceil(len(self.sample_x) / self.batch_size).astype(np.int64)

@@ -1,7 +1,6 @@
 from keras import backend as K
 import tensorflow as tf
-
-THRESHOLD = 0.5
+from constant import *
 
 
 def f1(y_true, y_pred):
