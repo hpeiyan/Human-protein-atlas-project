@@ -6,10 +6,14 @@ from cutsom_generator import CustomGenerator
 from model import MyModel
 from keras.optimizers import RMSprop
 from sklearn.model_selection import train_test_split
-from evaluate import f1
+from evaluate import f1, caculate_final_val
 from plot_info import plot, plot_img
 from keras.callbacks import ModelCheckpoint, EarlyStopping
 from constant import *
+from keras.models import load_model
+import tqdm
+from sklearn.metrics import f1_score as off1
+import pickle
 
 train_csv = pandas.read_csv(os.path.join(main_dir, 'train.csv'))
 display(train_csv.head(5))
@@ -30,7 +34,8 @@ def get_train_sample():
 
 
 sample_x, sample_y = get_train_sample()
-X_train, X_val, y_train, y_val = train_test_split(sample_x, sample_y, test_size=0.3, random_state=42)
+X_train, X_val, y_train, y_val = train_test_split(sample_x[0:test_samples], sample_y[0:test_samples], test_size=0.15,
+                                                  random_state=42)
 y_train = dict(y_train)
 y_val = dict(y_val)
 # y_train = dict(y_train)
@@ -78,4 +83,8 @@ history = model.fit_generator(generator=generator_train,
                               epochs=epochs,
                               callbacks=[checkpoint, ear_stop])
 
-plot(history, info_img_dir)
+# plot(history, info_img_dir)
+
+local_model = load_model(weight_dir, custom_objects={'f1': f1})
+
+caculate_final_val(generator_val, local_model)
