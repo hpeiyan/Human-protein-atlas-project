@@ -67,43 +67,43 @@ y_val = dict(y_val)
 # test_x = get_test_sample()
 # display(test_x)
 
-# generator_train = CustomGenerator(root_path=train_dir,
-#                                   sample_x=X_train,
-#                                   labels=y_train,
-#                                   batch_size=batch_size,
-#                                   dim=(input_dim, input_dim),
-#                                   n_channels=input_channel,
-#                                   n_classes=n_classes,
-#                                   shuffle=True)
+generator_train = CustomGenerator(root_path=train_dir,
+                                  sample_x=X_train,
+                                  labels=y_train,
+                                  batch_size=batch_size,
+                                  dim=(input_dim, input_dim),
+                                  n_channels=input_channel,
+                                  n_classes=n_classes,
+                                  shuffle=True)
+
+generator_val = CustomGenerator(root_path=train_dir,
+                                sample_x=X_val,
+                                labels=y_val,
+                                batch_size=batch_size,
+                                dim=(input_dim, input_dim),
+                                n_channels=input_channel,
+                                n_classes=n_classes,
+                                shuffle=False)
+
+# img_train_augment = CustomImageGenerator(**train_data_gen_args)
+# generator_train = img_train_augment.flow_from_gen(root_path=train_dir,
+#                                                   sample_x=X_val,
+#                                                   labels=y_val,
+#                                                   batch_size=batch_size,
+#                                                   dim=(input_dim, input_dim),
+#                                                   n_channels=input_channel,
+#                                                   n_classes=n_classes,
+#                                                   shuffle=False)
 #
-# generator_val = CustomGenerator(root_path=train_dir,
-#                                 sample_x=X_val,
-#                                 labels=y_val,
-#                                 batch_size=batch_size,
-#                                 dim=(input_dim, input_dim),
-#                                 n_channels=input_channel,
-#                                 n_classes=n_classes,
-#                                 shuffle=False)
-
-img_train_augment = CustomImageGenerator(**train_data_gen_args)
-generator_train = img_train_augment.flow_from_gen(root_path=train_dir,
-                                                  sample_x=X_val,
-                                                  labels=y_val,
-                                                  batch_size=batch_size,
-                                                  dim=(input_dim, input_dim),
-                                                  n_channels=input_channel,
-                                                  n_classes=n_classes,
-                                                  shuffle=False)
-
-img_val_augment = CustomImageGenerator(**val_data_gen_args)
-generator_val = img_val_augment.flow_from_gen(root_path=train_dir,
-                                              sample_x=X_val,
-                                              labels=y_val,
-                                              batch_size=batch_size,
-                                              dim=(input_dim, input_dim),
-                                              n_channels=input_channel,
-                                              n_classes=n_classes,
-                                              shuffle=False)
+# img_val_augment = CustomImageGenerator(**val_data_gen_args)
+# generator_val = img_val_augment.flow_from_gen(root_path=train_dir,
+#                                               sample_x=X_val,
+#                                               labels=y_val,
+#                                               batch_size=batch_size,
+#                                               dim=(input_dim, input_dim),
+#                                               n_channels=input_channel,
+#                                               n_classes=n_classes,
+#                                               shuffle=False)
 
 checkpoint = ModelCheckpoint(weight_dir,
                              monitor='val_f1',

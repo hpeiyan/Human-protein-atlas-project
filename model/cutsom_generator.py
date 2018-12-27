@@ -6,7 +6,7 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras.preprocessing.image import Iterator
 
 
-class CustomGenerator(Iterator):
+class CustomGenerator(Sequence):
 
     def __init__(self, root_path, sample_x, labels, batch_size, dim, n_channels=1,
                  n_classes=10, shuffle=True):
