@@ -15,6 +15,7 @@ score_val = os.path.join(main_dir, 'score.npy')
 input_dim = 224
 input_channel = 3
 batch_size = 128
+patience = 5
 n_classes = 28
 epochs = 30
 THRESHOLD = 0.5
