@@ -9,6 +9,8 @@ from tqdm import tqdm
 import pickle
 import numpy as np
 
+print(log_info + 'Apart data mode!!!' if debug_mode else 'Full data mode!!!')
+
 
 def get_test_sample():
     return list(set([test_sample[:36] for test_sample in os.listdir(test_dir)]))
@@ -18,8 +20,10 @@ submission = pd.read_csv(submission_csv)
 display(submission.head(), submission.describe())
 
 test_x = get_test_sample()
+if debug_mode:
+    test_x = test_x[0:test_samples]
 generator_test = CustomGenerator(root_path=test_dir,
-                                 sample_x=test_x[0:test_samples],
+                                 sample_x=test_x,
                                  labels=None,
                                  batch_size=batch_size,
                                  augment=False,
@@ -47,3 +51,7 @@ for row in tqdm(range(submission.shape[0])):
         else:
             str_label += str(col) + ' '
     prediction.append(str_label.strip())
+
+display(prediction)
+submission['Predicted'] = np.array(prediction)
+submission.to_csv(predict_csv, index=False)

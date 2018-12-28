@@ -15,6 +15,8 @@ import tqdm
 from sklearn.metrics import f1_score as off1
 import pickle
 
+print(log_info + 'Apart data mode!!!' if debug_mode else 'Full data mode!!!')
+
 train_csv = pandas.read_csv(os.path.join(main_dir, 'train.csv'))
 display(train_csv.head(5))
 
@@ -34,7 +36,12 @@ def get_train_sample():
 
 
 sample_x, sample_y = get_train_sample()
-X_train, X_val, y_train, y_val = train_test_split(sample_x[0:test_samples], sample_y[0:test_samples], test_size=0.15,
+if debug_mode:
+    epochs = 2
+    sample_x = sample_x[0:test_samples]
+    sample_y = sample_y[0:test_samples]
+
+X_train, X_val, y_train, y_val = train_test_split(sample_x, sample_y, test_size=0.15,
                                                   random_state=42)
 y_train = dict(y_train)
 y_val = dict(y_val)
