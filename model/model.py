@@ -20,18 +20,7 @@ class MyModel():
                                 kernel_size=(3, 3),
                                 activation='relu'))
         model.add(layers.MaxPool2D())
-        model.add(layers.Dropout(0.3))
-        model.add(layers.Conv2D(filters=128,
-                                kernel_size=(3, 3),
-                                activation='relu'))
-        model.add(layers.MaxPool2D())
-        model.add(layers.Dropout(0.3))
-        model.add(layers.Conv2D(filters=128,
-                                kernel_size=(3, 3),
-                                activation='relu'))
-        model.add(layers.MaxPool2D())
         model.add(layers.Flatten())
-        model.add(layers.Dense(128, activation='relu'))
         model.add(layers.Dense(64, activation='relu'))
         model.add(layers.Dense(28, activation='sigmoid'))
         model.summary()
