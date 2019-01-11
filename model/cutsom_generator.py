@@ -7,7 +7,10 @@ from keras.preprocessing.image import Iterator
 import imgaug as ia
 # from IPython.display import display
 from imgaug import augmenters as iaa
+# from model.plot_info import plot_img
+# from model.constant import *
 from plot_info import plot_img
+from constant import *
 
 
 class CustomGenerator(Sequence):
@@ -33,12 +36,11 @@ class CustomGenerator(Sequence):
         if self.shuffle:
             np.random.shuffle(self.indexes)
 
-    def __data_generation(self, samples_temp):
+    def __data_generation(self, samples_temp, index):
         'Generates data containing batch_size samples'  # X : (n_samples, *dim, n_channels)
         # Initialization
         X = np.empty((self.batch_size, *self.dim, self.n_channels))
         Y = np.zeros((self.batch_size, 28))
-        colors = ['red', 'green', 'blue']
 
         seq = iaa.Sequential([
             iaa.OneOf([
@@ -86,6 +88,11 @@ class CustomGenerator(Sequence):
                 for key in self.labels[ID]:
                     Y[i, int(key)] = 1
 
+        if plot_img:
+            print(log_info + "start plotting " + str(index) + "images")
+            plot_img(X, os.path.join(merge_img_dir, str(index) + '.png'))
+            print(log_info + "ending plot " + str(index) + "images")
+
         if self.augment:
             X = seq.augment_images(X)
 
@@ -97,7 +104,7 @@ class CustomGenerator(Sequence):
     def __getitem__(self, index):
         indexs = self.indexes[index * self.batch_size: (index + 1) * self.batch_size]
         sample_temp = [self.sample_x[i] for i in indexs]
-        return self.__data_generation(sample_temp)
+        return self.__data_generation(sample_temp, index)
 
     def __len__(self):
         return np.ceil(len(self.sample_x) / self.batch_size).astype(np.int64)

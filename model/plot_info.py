@@ -2,6 +2,7 @@ import matplotlib
 
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
+import math
 
 
 def plot(history, img_path):
@@ -32,9 +33,9 @@ def plot(history, img_path):
 
 
 def plot_img(imgs, img_path):
-    fig, axes = plt.subplots(1, 5, figsize=(20, 20))
+    fig, axes = plt.subplots(1, 8, figsize=(50, 50))
 
-    for idx in range(5):
+    for idx in range(8):
         axes[idx].imshow(imgs[idx,])
     plt.savefig(img_path)
     # plt.show()

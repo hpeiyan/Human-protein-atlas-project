@@ -6,7 +6,7 @@ from cutsom_generator import CustomGenerator
 from model import MyModel
 from keras.optimizers import RMSprop
 from sklearn.model_selection import train_test_split
-from evaluate import f1, caculate_final_val
+from evaluate import focal_loss
 from plot_info import plot, plot_img
 from keras.callbacks import ModelCheckpoint, EarlyStopping
 from constant import *
@@ -58,18 +58,18 @@ generator_val = CustomGenerator(root_path=train_dir,
                                 shuffle=False)
 
 checkpoint = ModelCheckpoint(weight_dir,
-                             monitor='val_f1',
+                             # monitor='val_loss',
+                             # mode='min',
                              verbose=1,
                              save_best_only=True,
                              save_weights_only=False,
-                             mode='max',
                              period=1)
-ear_stop = EarlyStopping(monitor='val_f1', mode='max', patience=patience)
+ear_stop = EarlyStopping(patience=patience)
 myModel = MyModel(input_shape=(input_dim, input_dim, input_channel))
 model = myModel.buildModel()
 model.compile(optimizer=RMSprop(),
               loss='binary_crossentropy',
-              metrics=['acc', f1])
+              metrics=['acc', focal_loss])
 history = model.fit_generator(generator=generator_train,
                               steps_per_epoch=len(generator_train),
                               validation_data=generator_val,
@@ -79,6 +79,6 @@ history = model.fit_generator(generator=generator_train,
 
 # plot(history, info_img_dir)
 
-local_model = load_model(weight_dir, custom_objects={'f1': f1})
-
-caculate_final_val(generator_val, local_model)
+# local_model = load_model(weight_dir, custom_objects={'f1': f1})
+#
+# caculate_final_val(generator_val, local_model)
