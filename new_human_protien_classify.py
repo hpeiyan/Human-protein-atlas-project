@@ -1,4 +1,3 @@
-import os
 import pandas
 from IPython.display import display
 import numpy as np
@@ -6,14 +5,9 @@ from cutsom_generator import CustomGenerator
 from model import MyModel
 from keras.optimizers import RMSprop
 from sklearn.model_selection import train_test_split
-from evaluate import focal_loss
-from plot_info import plot, plot_img
+from evaluate import f1
 from keras.callbacks import ModelCheckpoint, EarlyStopping
 from constant import *
-from keras.models import load_model
-import tqdm
-from sklearn.metrics import f1_score as off1
-import pickle
 
 print(log_info + 'Apart data mode!!!' if debug_mode else 'Full data mode!!!')
 
@@ -69,16 +63,10 @@ myModel = MyModel(input_shape=(input_dim, input_dim, input_channel))
 model = myModel.buildModel()
 model.compile(optimizer=RMSprop(),
               loss='binary_crossentropy',
-              metrics=['acc', focal_loss])
+              metrics=['acc', f1])
 history = model.fit_generator(generator=generator_train,
                               steps_per_epoch=len(generator_train),
                               validation_data=generator_val,
                               validation_steps=len(generator_val),
                               epochs=epochs,
                               callbacks=[checkpoint, ear_stop])
-
-# plot(history, info_img_dir)
-
-# local_model = load_model(weight_dir, custom_objects={'f1': f1})
-#
-# caculate_final_val(generator_val, local_model)

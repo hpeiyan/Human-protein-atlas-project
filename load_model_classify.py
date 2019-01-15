@@ -1,6 +1,6 @@
 import os
 from keras.models import load_model
-from evaluate import focal_loss
+from evaluate import f1
 from cutsom_generator import CustomGenerator
 from constant import *
 from IPython.display import display
@@ -32,7 +32,7 @@ generator_test = CustomGenerator(root_path=test_dir,
                                  n_classes=n_classes,
                                  shuffle=False)
 
-model = load_model(weight_dir, custom_objects={'focal_loss': focal_loss})
+model = load_model(weight_dir, custom_objects={'f1': f1})
 predict = model.predict_generator(generator=generator_test,
                                   steps=len(generator_test))
 display(predict)

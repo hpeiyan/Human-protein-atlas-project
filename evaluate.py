@@ -9,9 +9,7 @@ import pickle
 
 
 def f1(y_true, y_pred):
-    y_pred = K.round(y_pred)
     tp = K.sum(K.cast(y_true * y_pred, 'float'), axis=0)
-    # tn = K.sum(K.cast((1-y_true)*(1-y_pred), 'float'), axis=0)
     fp = K.sum(K.cast((1 - y_true) * y_pred, 'float'), axis=0)
     fn = K.sum(K.cast(y_true * (1 - y_pred), 'float'), axis=0)
 
@@ -19,16 +17,8 @@ def f1(y_true, y_pred):
     r = tp / (tp + fn + K.epsilon())
 
     f1 = 2 * p * r / (p + r + K.epsilon())
-    f1 = tf.where(tf.is_nan(f1), tf.zeros_like(f1), f1)
+    f1 = tf.where(tf.is_nan(f1), tf.zeros_like(f1), f1) # 如果f1的元素是Nan，替换成0，否则替换f1（也就是不变）
     return K.mean(f1)
-
-
-def micro_loss(y_true, y_pred):
-    return f1_score(y_true, y_pred, average='micro')
-
-
-def macro_loss(y_true, y_pred):
-    return f1_score(y_true, y_pred, average='macro')
 
 
 def focal_loss(y_true, y_pred):
