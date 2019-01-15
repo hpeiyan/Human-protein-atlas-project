@@ -2,6 +2,9 @@ from keras.models import Sequential
 from keras import layers
 from keras.applications import VGG19
 from keras.applications import ResNet50
+from keras.applications import InceptionResNetV2
+from keras.layers import Input,BatchNormalization,Conv2D
+from keras.models import Model
 from constant import *
 
 
@@ -59,4 +62,23 @@ class MyModel():
         model.add(layers.Dense(64, activation='relu'))
         model.add(layers.Dense(28, activation='sigmoid'))
         model.summary()
+        return model
+
+    def fine_tune_inception(self):
+        pretrain_model = InceptionResNetV2(
+            include_top=False,
+            weights='imagenet',
+            input_shape=self.input_shape)
+
+        input_tensor = Input(shape=self.input_shape)
+        bn = BatchNormalization()(input_tensor)
+        x = pretrain_model(bn)
+        x = Conv2D(128, kernel_size=(1, 1), activation='relu')(x)
+        x = layers.Flatten()(x)
+        x = layers.Dropout(0.5)(x)
+        x = layers.Dense(512, activation='relu')(x)
+        x = layers.Dropout(0.5)(x)
+        output = layers.Dense(n_classes, activation='sigmoid')(x)
+        model = Model(input_tensor, output)
+
         return model

@@ -35,17 +35,13 @@ generator_test = CustomGenerator(root_path=test_dir,
 model = load_model(weight_dir, custom_objects={'f1': f1})
 predict = model.predict_generator(generator=generator_test,
                                   steps=len(generator_test))
-display(predict)
+display(predict[:10, :])
 prediction = []
 
-# T = np.load(score_val)
-# display(T)
 for row in tqdm(range(submission.shape[0])):
-
     str_label = ''
-
     for col in range(predict.shape[1]):
-        if (predict[row, col] < 0.5):
+        if (predict[row, col] < 0.02):
             str_label += ''
         else:
             str_label += str(col) + ' '

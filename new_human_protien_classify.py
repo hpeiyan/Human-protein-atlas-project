@@ -3,7 +3,7 @@ from IPython.display import display
 import numpy as np
 from cutsom_generator import CustomGenerator
 from model import MyModel
-from keras.optimizers import RMSprop
+from keras.optimizers import RMSprop, Adam
 from sklearn.model_selection import train_test_split
 from evaluate import f1
 from keras.callbacks import ModelCheckpoint, EarlyStopping
@@ -26,7 +26,7 @@ if debug_mode:
     sample_x = sample_x[0:test_samples]
     sample_y = sample_y[0:test_samples]
 
-X_train, X_val, y_train, y_val = train_test_split(sample_x, sample_y, test_size=0.15,
+X_train, X_val, y_train, y_val = train_test_split(sample_x, sample_y, test_size=0.2,
                                                   random_state=42)
 y_train = dict(y_train)
 y_val = dict(y_val)
@@ -60,8 +60,8 @@ checkpoint = ModelCheckpoint(weight_dir,
                              period=1)
 ear_stop = EarlyStopping(patience=patience)
 myModel = MyModel(input_shape=(input_dim, input_dim, input_channel))
-model = myModel.buildModel()
-model.compile(optimizer=RMSprop(),
+model = myModel.fineTuneModel()
+model.compile(optimizer=Adam(lr=1e-4),
               loss='binary_crossentropy',
               metrics=['acc', f1])
 history = model.fit_generator(generator=generator_train,
