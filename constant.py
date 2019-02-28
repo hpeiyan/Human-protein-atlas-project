@@ -1,6 +1,6 @@
 import os
 
-debug_mode = False
+debug_mode = True
 plot_img = False
 log_info = '[log_info] '
 

@@ -6,9 +6,14 @@ from model import MyModel
 from keras.optimizers import RMSprop, Adam
 from sklearn.model_selection import train_test_split
 from evaluate import f1
+from evaluate import Metrics
 from keras.callbacks import ModelCheckpoint, EarlyStopping
+from plot_info import plot
 from constant import *
+import matplotlib
+import matplotlib.pyplot as plt
 
+matplotlib.use('agg')
 print(log_info + 'Apart data mode!!!' if debug_mode else 'Full data mode!!!')
 
 train_csv = pandas.read_csv(os.path.join(main_dir, 'train.csv'))
@@ -52,21 +57,44 @@ generator_val = CustomGenerator(root_path=train_dir,
                                 shuffle=False)
 
 checkpoint = ModelCheckpoint(weight_dir,
-                             # monitor='val_loss',
-                             # mode='min',
+                             monitor='val_f1',
+                             mode='max',
                              verbose=1,
                              save_best_only=True,
                              save_weights_only=False,
                              period=1)
+metrics = Metrics()
+
 ear_stop = EarlyStopping(patience=patience)
 myModel = MyModel(input_shape=(input_dim, input_dim, input_channel))
-model = myModel.fineTuneModel()
+model = myModel.buildModel()
 model.compile(optimizer=Adam(lr=1e-4),
               loss='binary_crossentropy',
-              metrics=['acc', f1])
+              metrics=[f1])
 history = model.fit_generator(generator=generator_train,
                               steps_per_epoch=len(generator_train),
                               validation_data=generator_val,
                               validation_steps=len(generator_val),
                               epochs=epochs,
                               callbacks=[checkpoint, ear_stop])
+# callbacks=[metrics])
+
+# plot(history,info_img_dir)
+
+train_loss = history.history['loss']
+val_loss = history.history['val_loss']
+train_f1 = history.history['f1']
+val_f1 = history.history['val_f1']
+
+epochs = range(1, len(val_f1) + 1)
+
+plt.plot(epochs, train_f1, label='train_f1')
+plt.plot(epochs, val_f1, label='val_f1')
+plt.legend()
+
+plt.figure()
+plt.plot(epochs, train_loss, label='train_loss')
+plt.plot(epochs, val_loss, label='val_loss')
+plt.legend()
+plt.show()
+plt.savefig("image.png")

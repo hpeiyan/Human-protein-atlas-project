@@ -41,7 +41,7 @@ prediction = []
 for row in tqdm(range(submission.shape[0])):
     str_label = ''
     for col in range(predict.shape[1]):
-        if (predict[row, col] < 0.02):
+        if (predict[row, col] < 0.3):
             str_label += ''
         else:
             str_label += str(col) + ' '
