@@ -8,6 +8,9 @@ import pandas as pd
 from tqdm import tqdm
 import pickle
 import numpy as np
+import os
+
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 print(log_info + 'Apart data mode!!!' if debug_mode else 'Full data mode!!!')
 
@@ -41,7 +44,7 @@ prediction = []
 for row in tqdm(range(submission.shape[0])):
     str_label = ''
     for col in range(predict.shape[1]):
-        if (predict[row, col] < 0.3):
+        if (predict[row, col] < 0.1):
             str_label += ''
         else:
             str_label += str(col) + ' '

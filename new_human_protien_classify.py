@@ -12,8 +12,12 @@ from plot_info import plot
 from constant import *
 import matplotlib
 import matplotlib.pyplot as plt
+import os
 
-matplotlib.use('agg')
+# os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+
+plt.switch_backend('Agg')
+# matplotlib.use('agg')
 print(log_info + 'Apart data mode!!!' if debug_mode else 'Full data mode!!!')
 
 train_csv = pandas.read_csv(os.path.join(main_dir, 'train.csv'))
@@ -67,8 +71,8 @@ metrics = Metrics()
 
 ear_stop = EarlyStopping(patience=patience)
 myModel = MyModel(input_shape=(input_dim, input_dim, input_channel))
-model = myModel.buildModel()
-model.compile(optimizer=Adam(lr=1e-4),
+model = myModel.DenseNet()
+model.compile(optimizer=Adam(),
               loss='binary_crossentropy',
               metrics=[f1])
 history = model.fit_generator(generator=generator_train,

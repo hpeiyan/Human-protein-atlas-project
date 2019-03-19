@@ -74,6 +74,9 @@ def caculate_final_val(fullValGen, model):
 
 
 class Metrics(Callback):
+    '''
+    Defined your personal callback
+    '''
     def on_train_begin(self, logs={}):
         self.val_f1s = []
         self.val_recalls = []
